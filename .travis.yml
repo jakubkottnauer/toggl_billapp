@@ -1,0 +1,12 @@
+language: elixir
+elixir:
+  - 1.4.0
+notifications:
+  recipients:
+    - victor@diacode.com
+env:
+  - MIX_ENV=test
+script:
+  - "mix do deps.get, compile, coveralls.travis"
+after_script:
+  - "MIX_ENV=docs mix do deps.get, inch.report"
