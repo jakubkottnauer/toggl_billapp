@@ -1,9 +1,6 @@
 language: elixir
 elixir:
   - 1.4.0
-notifications:
-  recipients:
-    - victor@diacode.com
 env:
   - MIX_ENV=test
 script:
