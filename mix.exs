@@ -23,7 +23,8 @@ defmodule TogglBillapp.Mixfile do
   defp deps do
     [
       {:togglex, "~> 0.1.0"},
-      {:excoveralls, "~> 0.7", only: :test}
+      {:excoveralls, "~> 0.7", only: :test},
+      {:credo, "~> 0.3", only: [:dev, :test]}
     ]
   end
 end
