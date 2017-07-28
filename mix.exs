@@ -5,7 +5,7 @@ defmodule TogglBillapp.Mixfile do
     [
       app: :toggl_billapp,
       version: "0.1.0",
-      elixir: "~> 1.4",
+      elixir: "~> 1.5",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       escript: [main_module: TogglBillapp.CLI],
@@ -16,7 +16,7 @@ defmodule TogglBillapp.Mixfile do
   end
 
   def application do
-    [applications: [:togglex]]
+    [applications: [:togglex, :httpoison]]
     [extra_applications: [:logger]]
   end
 
@@ -24,7 +24,8 @@ defmodule TogglBillapp.Mixfile do
     [
       {:togglex, "~> 0.1.0"},
       {:excoveralls, "~> 0.7", only: :test},
-      {:credo, "~> 0.3", only: [:dev, :test]}
+      {:credo, "~> 0.3", only: [:dev, :test]},
+      {:httpoison, "~> 0.8.3"}
     ]
   end
 end

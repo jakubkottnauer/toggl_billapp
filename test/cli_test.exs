@@ -22,16 +22,35 @@ defmodule TogglBillapp.CLITest do
     }
 
     expected_result = [
-      %{
-        project: "amazing project",
-        hours: 1.0
-      },
-      %{
-        project: "another great project",
-        hours: 28.52
-      }
+      %{ project: "amazing project", hours: 1.0 },
+      %{ project: "another great project", hours: 28.52 }
     ]
 
     assert extract_project_hours(data) == expected_result
+  end
+
+  test "translate_project_names translates project names" do
+    dictionary = %{ "amazing project" => "HR consulting"}
+    data = [
+      %{ project: "amazing project", hours: 1.0 },
+      %{ project: "another great project", hours: 28.52 }
+    ]
+
+    expected_result = [
+      %{ project: "HR consulting", hours: 1.0 },
+      %{ project: "another great project", hours: 28.52 }
+    ]
+  
+    assert translate_project_names(data, dictionary) == expected_result
+  end
+
+  test "translate_project_names works with empty dictionary and does not modify input" do
+    dictionary = %{}
+    data = [
+      %{ project: "amazing project", hours: 1.0 },
+      %{ project: "another great project", hours: 28.52 }
+    ]
+
+    assert translate_project_names(data, dictionary) == data
   end
 end

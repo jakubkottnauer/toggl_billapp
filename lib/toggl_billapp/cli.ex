@@ -3,9 +3,15 @@ defmodule TogglBillapp.CLI do
   CLI interface of the app.
   """
 
+  alias TogglBillapp.Billapp, as: Billapp
+
   def main(args) do
+    dictionary = %{}
+
     get_last_month_toggl()
     |> extract_project_hours
+    |> translate_project_names(dictionary)
+    |> compose_billapp_request
   end
 
   def get_last_month_toggl do
@@ -33,8 +39,34 @@ defmodule TogglBillapp.CLI do
   """
   def extract_project_hours(data) do
     data.data
-    |> Enum.reduce [], fn record, acc ->
+    |> Enum.reduce([], fn record, acc ->
         acc ++ [%{ project: record.title.project, hours: Float.round(record.time / 1_000 / 60, 2)  }] 
-      end 
+      end)
+  end
+
+  @doc """
+  Translates project names using a dictionary.
+  Useful for renaming projects like "Self-study" to "HR consulting" or whatever
+
+  ## Parameters
+    - data: Array of projects and time spent on them
+    - dictionary: Map with project names translations
+  """
+  def translate_project_names(data, dictionary) do
+    data
+    |> Enum.map(fn entry 
+      -> Map.put(entry, :project, Map.get(dictionary, entry.project, entry.project))
+    end)
+  end
+
+  @doc """
+  Returns JSON to be sent to billapp
+
+  ## Parameters
+    - data: Array of projects and time spent on them
+  """
+  def compose_billapp_request(data) do
+    Billapp.get_last_invoice
+    |> IO.inspect
   end
 end
