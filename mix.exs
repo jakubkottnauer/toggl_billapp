@@ -1,4 +1,8 @@
 defmodule TogglBillapp.Mixfile do
+  @moduledoc """
+  Mix config
+  """
+
   use Mix.Project
 
   def project do
@@ -22,7 +26,7 @@ defmodule TogglBillapp.Mixfile do
 
   defp deps do
     [
-      {:togglex, "~> 0.1.0"},
+      {:togglex, "~> 0.2.0"},
       {:excoveralls, "~> 0.7", only: :test},
       {:credo, "~> 0.3", only: [:dev, :test]},
       {:httpoison, "~> 0.8.3"}

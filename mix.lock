@@ -11,4 +11,4 @@
   "mimerl": {:hex, :mimerl, "1.0.2", "993f9b0e084083405ed8252b99460c4f0563e41729ab42d9074fd5e52439be88", [:rebar3], [], "hexpm"},
   "poison": {:hex, :poison, "2.1.0", "f583218ced822675e484648fa26c933d621373f01c6c76bd00005d7bd4b82e27", [:mix], [], "hexpm"},
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.1", "28a4d65b7f59893bc2c7de786dec1e1555bd742d336043fe644ae956c3497fbe", [:make, :rebar], [], "hexpm"},
-  "togglex": {:hex, :togglex, "0.1.0", "486285fb593623a86861c7c3593fb8eaacac5f049bf0288698828774eeafbe29", [:mix], [{:httpoison, "~> 0.8.1", [hex: :httpoison, repo: "hexpm", optional: false]}, {:poison, "~> 2.1.0", [hex: :poison, repo: "hexpm", optional: false]}], "hexpm"}}
+  "togglex": {:hex, :togglex, "0.2.0", "ca757772643a06f9e4b9e559febb11cee6713b89a26c9c0726eab9f2927c7e81", [:mix], [{:httpoison, "~> 0.8.1", [hex: :httpoison, repo: "hexpm", optional: false]}, {:poison, "~> 2.1.0", [hex: :poison, repo: "hexpm", optional: false]}], "hexpm"}}

@@ -2,7 +2,7 @@ defmodule TogglBillapp.CLI do
   @moduledoc """
   CLI interface of the app.
   """
-
+  
   alias TogglBillapp.Billapp, as: Billapp
 
   def main(args) do
@@ -12,6 +12,7 @@ defmodule TogglBillapp.CLI do
     |> extract_project_hours
     |> translate_project_names(dictionary)
     |> compose_billapp_request
+    |> send_billapp_invoice
   end
 
   def get_last_month_toggl do
@@ -40,7 +41,7 @@ defmodule TogglBillapp.CLI do
   def extract_project_hours(data) do
     data.data
     |> Enum.reduce([], fn record, acc ->
-        acc ++ [%{ project: record.title.project, hours: Float.round(record.time / 1_000 / 60, 2)  }] 
+        acc ++ [%{ project: record.title.project, hours: Float.round(record.time / 1_000 / 60 / 60, 2)  }] 
       end)
   end
 
@@ -66,7 +67,36 @@ defmodule TogglBillapp.CLI do
     - data: Array of projects and time spent on them
   """
   def compose_billapp_request(data) do
-    Billapp.get_last_invoice
-    |> IO.inspect
+    last_invoice = Billapp.get_last_invoice_data
+    %{
+      "invoice": %{
+        "number": "201700022",
+        "account-id": last_invoice.account_id,
+        "client-id": last_invoice.client_id,
+        "issue-date": "2017-07-20",
+        "lines-attributes": Enum.map(data, fn entry
+          -> %{
+            "line": %{
+              "description": entry.project,
+              "quantity": entry.hours,
+              "unit-price": "50",
+              "unit-type": "hod."
+            }
+          }
+          end
+          )
+      }
+    }
+    |> Poison.encode!
+  end
+
+  @doc """
+  Sends JSON to billapp to create a new invoice
+
+  ## Parameters
+    - json: json to send
+  """
+  def send_billapp_invoice(json) do
+    Billapp.send_invoice(json)
   end
 end
