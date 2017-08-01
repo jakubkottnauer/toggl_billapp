@@ -2,17 +2,21 @@ defmodule TogglBillapp.CLI do
   @moduledoc """
   CLI interface of the app.
   """
-  
+
   alias TogglBillapp.Billapp, as: Billapp
 
   def main(args) do
-    dictionary = %{}
+    dictionary = %{
+      "Self-study" => ["Konzultace", "Školení"]
+    }
 
     get_last_month_toggl()
     |> extract_project_hours
     |> translate_project_names(dictionary)
     |> compose_billapp_request
-    |> send_billapp_invoice
+    |> Billapp.send_invoice
+    |> Map.get(:id)
+    |> Billapp.download_invoice_pdf
   end
 
   def get_last_month_toggl do
@@ -45,9 +49,18 @@ defmodule TogglBillapp.CLI do
       end)
   end
 
+  defp get_project_translation(translations) when is_list(translations) do
+    translations |> Enum.random
+  end
+
+  defp get_project_translation(translation) do
+    translation
+  end
+
   @doc """
   Translates project names using a dictionary.
-  Useful for renaming projects like "Self-study" to "HR consulting" or whatever
+  Useful for renaming projects like "Self-study" to "HR consulting" or whatever.
+  If a list of translations is specified for a key, a random one is chosen :-)
 
   ## Parameters
     - data: Array of projects and time spent on them
@@ -56,7 +69,9 @@ defmodule TogglBillapp.CLI do
   def translate_project_names(data, dictionary) do
     data
     |> Enum.map(fn entry 
-      -> Map.put(entry, :project, Map.get(dictionary, entry.project, entry.project))
+      ->
+        project = Map.get(dictionary, entry.project, entry.project)
+        Map.put(entry, :project, get_project_translation(project))
     end)
   end
 
@@ -70,33 +85,23 @@ defmodule TogglBillapp.CLI do
     last_invoice = Billapp.get_last_invoice_data
     %{
       "invoice": %{
-        "number": "201700022",
-        "account-id": last_invoice.account_id,
-        "client-id": last_invoice.client_id,
-        "issue-date": "2017-07-20",
-        "lines-attributes": Enum.map(data, fn entry
+        "number": "2017000255",
+        "account_id": last_invoice.account_id,
+        "client_id": last_invoice.client_id,
+        "issue_date": "2017-07-20",
+        "due_date": "2017-07-30",
+        "show_logo": false,
+        "lines_attributes": Enum.map(data, fn entry
           -> %{
-            "line": %{
               "description": entry.project,
-              "quantity": entry.hours,
-              "unit-price": "50",
-              "unit-type": "hod."
+              "quantity": 10.0,
+              "unit_price": 50.0,
+              "vat": 0.0
             }
-          }
           end
           )
       }
     }
     |> Poison.encode!
-  end
-
-  @doc """
-  Sends JSON to billapp to create a new invoice
-
-  ## Parameters
-    - json: json to send
-  """
-  def send_billapp_invoice(json) do
-    Billapp.send_invoice(json)
   end
 end
