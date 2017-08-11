@@ -4,19 +4,27 @@ defmodule TogglBillapp.CLI do
   """
 
   alias TogglBillapp.Billapp, as: Billapp
+  alias TogglBillapp.Cheddar, as: Cheddar
 
   def main(args) do
     dictionary = %{
-      "Self-study" => ["Konzultace", "Školení"]
+      "Self-study" => ["Konzultace", "Školení", "Textace", "Opravy IDK"]
     }
+
+    department_projects = %{
+      "blueberryapps" => ["Self-study", "_Other", "Open-Source", "Human resources", "Bonuses"]
+    }
+
+    defaultDepartment = "DevTeam"
 
     get_last_month_toggl()
     |> extract_project_hours
+    #|> split_into_departments
     |> translate_project_names(dictionary)
-    |> compose_billapp_request
     |> Billapp.send_invoice
     |> Map.get(:id)
     |> Billapp.download_invoice_pdf
+    |> Cheddar.send_invoice
   end
 
   def get_last_month_toggl do
@@ -34,6 +42,13 @@ defmodule TogglBillapp.CLI do
         user_ids: toggl_user_id,
         workspace_id: toggl_workspace_id
       })
+  end
+
+  def split_into_departments(data) do
+    data
+    |> Enum.group_by(fn x -> 
+      
+    end)
   end
 
   @doc """
@@ -73,35 +88,5 @@ defmodule TogglBillapp.CLI do
         project = Map.get(dictionary, entry.project, entry.project)
         Map.put(entry, :project, get_project_translation(project))
     end)
-  end
-
-  @doc """
-  Returns JSON to be sent to billapp
-
-  ## Parameters
-    - data: Array of projects and time spent on them
-  """
-  def compose_billapp_request(data) do
-    last_invoice = Billapp.get_last_invoice_data
-    %{
-      "invoice": %{
-        "number": "2017000255",
-        "account_id": last_invoice.account_id,
-        "client_id": last_invoice.client_id,
-        "issue_date": "2017-07-20",
-        "due_date": "2017-07-30",
-        "show_logo": false,
-        "lines_attributes": Enum.map(data, fn entry
-          -> %{
-              "description": entry.project,
-              "quantity": 10.0,
-              "unit_price": 50.0,
-              "vat": 0.0
-            }
-          end
-          )
-      }
-    }
-    |> Poison.encode!
   end
 end
